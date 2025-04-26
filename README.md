@@ -1,354 +1,144 @@
-# AI PDF Chatbot & Agent Powered by LangChain and LangGraph
+# HyroCoach - AI Fitness Coach Chatbot
 
-This monorepo is a customizable template example of an AI chatbot agent that "ingests" PDF documents, stores embeddings in a vector database (Supabase), and then answers user queries using OpenAI (or another LLM provider) utilising LangChain and LangGraph as orchestration frameworks.
+HyroCoach is een AI-gestuurde chatbot ontworpen als je persoonlijke fitnesscoach. Upload je trainingsschema's of voedingsgidsen (als PDF), en HyroCoach gebruikt deze documenten om je vragen te beantwoorden en gepersonaliseerd advies te geven via een chatinterface.
 
-This template is also an accompanying example to the book [Learning LangChain (O'Reilly)](https://www.oreilly.com/library/view/learning-langchain/9781098167271): Building AI and LLM applications with LangChain and LangGraph.
-
-**Here's what the Chatbot UI looks like:**
-
-<img width="1096" alt="Screenshot 2025-02-20 at 05 39 55" src="https://github.com/user-attachments/assets/3a9ddea7-b718-476b-bdae-38839be20c12" />
-
-## Table of Contents
-
-1. [Features](#features)
-2. [Architecture Overview](#architecture-overview)
-3. [Prerequisites](#prerequisites)
-4. [Installation](#installation)
-5. [Environment Variables](#environment-variables)
-   - [Frontend Variables](#frontend-variables)
-   - [Backend Variables](#backend-variables)
-6. [Local Development](#local-development)
-   - [Running the Backend](#running-the-backend)
-   - [Running the Frontend](#running-the-frontend)
-7. [Usage](#usage)
-   - [Uploading/Ingesting PDFs](#uploadingingesting-pdfs)
-   - [Asking Questions](#asking-questions)
-   - [Viewing Chat History](#viewing-chat-history)
-8. [Production Build & Deployment](#production-build--deployment)
-9. [Customizing the Agent](#customizing-the-agent)
-10. [Troubleshooting](#troubleshooting)
-11. [Next Steps](#next-steps)
-
----
-
-## Status Schoolopdracht PRG08 (Opdracht 2: Taalmodel)
-
-Dit gedeelte beschrijft de huidige status van dit project ten opzichte van de beoordelingscriteria voor Opdracht 2: Taalmodel van PRG08 (d.d. 26-04-2025, na initiële setup en aanpassingen).
-
-**Concept:**
-
-*   **Categorie & Doelgroep:** Nog te kiezen en implementeren door de student. Het huidige project is een generieke PDF-chatbot.
-*   **Toegevoegde Waarde:** Nog te bepalen en uit te leggen door de student op basis van gekozen categorie/doelgroep.
-
-**Beoordeling:**
-
-**Leerdoel: AI tools integreren in een professioneel ingerichte javascript applicatie.**
-
-*   **Beginner (5 punten):**
-    *   Client/Server onderdeel: **Voldaan** (frontend/backend mappen).
-    *   Project op GitHub met README: **Voldaan** (origineel project staat op GitHub, README aanwezig).
-    *   README bevat installatie/issues: **Voldaan** (originele README bevat dit). *README is aangepast, controleer of npm instructies duidelijk zijn.*
-    *   API keys afgeschermd (.env): **Voldaan** (gebruikt `.env` in backend en frontend).
-    *   Server communiceert met OpenAI: **Voldaan** (gebruikt OpenAI via LangChain).
-*   **Op Niveau (15 punten):**
-    *   Client toont resultaten (UI): **Voldaan** (React frontend toont chat).
-    *   Gebruiksvriendelijke/duidelijke interface: **Voldaan** (standaard UI is redelijk).
-    *   Gebruikersinvoer voor prompt: **Voldaan**.
-    *   Geen calls voor vorig resultaat: **Waarschijnlijk Voldaan** (standaard UI-patronen voorkomen dit meestal, maar niet expliciet getest).
-*   **Expert (25 punten):**
-    *   Project live online: **Nog te doen**.
-
-**Leerdoel: Werken met taalmodellen en de bijbehorende API's in javascript.**
-
-*   **Beginner (5 punten):**
-    *   Server call naar Azure OpenAI API: **Niet Voldaan** (gebruikt nu standaard OpenAI API. Aanpassing nodig naar Azure).
-    *   Uitleggen code/ChatLLM: *N.v.t. (Kennis student)*.
-*   **Op Niveau (15 punten):**
-    *   Uitleggen/toepassen Prompt Engineering: **Gedeeltelijk Voldaan** (prompts bestaan en zijn aangepast (`prompts.ts`), student moet toepassing uitleggen).
-    *   Chat History (met roles) op server: **Niet Voldaan** (huidige history is enkel in frontend state). *Implementatie nodig.*
-*   **Expert (25 punten):**
-    *   Applicatie werkt met streaming: **Voldaan** (backend/frontend ondersteunen streaming).
-
-**Leerdoel: Een taalmodel gebruiken om vragen over mijn eigen documenten te beantwoorden.**
-
-*   **Beginner (5 punten):**
-    *   Uitleggen nut RAG: *N.v.t. (Kennis student)*.
-*   **Op Niveau (15 punten):**
-    *   Embeddings gemaakt van eigen document: **Voldaan** (PDF wordt verwerkt tot embeddings).
-    *   Embeddings opgeslagen in database: **Voldaan** (gebruikt Supabase vector store).
-    *   Vragen stellen over eigen document: **Voldaan** (kernfunctionaliteit van de RAG-setup).
-*   **Expert (25 punten):**
-    *   Werkt met grotere bestanden (min. 15 pagina's): **Nog te testen**.
-
-**Leerdoel: Op conceptueel niveau nadenken over AI toepassingen. Ik kan zelfstandig onderzoek doen naar documentatie.**
-
-*   **Beginner (5 punten):**
-    *   Uitleg categorie/doelgroep/toegevoegde waarde: *N.v.t. (Actie/Kennis student)*.
-*   **Op Niveau (15 punten):**
-    *   Toegang tot live data (internet): **Niet Voldaan**.
-    *   OF Meerdere taalmodellen uitgeprobeerd: **Niet Voldaan**.
-*   **Expert (25 punten):**
-    *   Spraak/spraakherkenning gebruikt: **Niet Voldaan**.
-    *   OF Taalmodel geïntegreerd in React applicatie: **Voldaan** (frontend is een React/Next.js app).
-
-**Samenvatting & Volgende Stappen:**
-
-Dit project vormt een **zeer goede basis** en voldoet al aan veel criteria op Beginner- en Op Niveau-niveau, en zelfs enkele Expert-criteria (Streaming, React Frontend, RAG).
-
-**Belangrijkste openstaande punten voor de student:**
-
-1.  **Azure OpenAI API:** Backend aanpassen om Azure te gebruiken i.p.v. standaard OpenAI.
-2.  **Server-Side Chat History:** Implementeren in de backend om context te behouden over meerdere beurten.
-3.  **Hosting:** Project online deployen.
-4.  **Testen met Grote Bestanden:** Verifiëren of de RAG-pipeline werkt met PDF's van 15+ pagina's.
-5.  **Concept Uitwerking:** Categorie en doelgroep kiezen en dit eventueel reflecteren in de applicatie (bv. specifieke prompts/UI).
-6.  **Kennis/Uitleg Student:** Voorbereiden op het uitleggen van de code, concepten (ChatLLM, RAG, Prompt Engineering) en keuzes in de video.
-7.  **README Updates:** Controleren en eventueel de installatie/run instructies bijwerken voor `npm` (indien nodig) en de Supabase setup toevoegen.
-
----
+De kern van de chatbot wordt gevormd door OpenAI's taalmodellen, georkestreerd met LangChain en LangGraph. Voor het opslaan en efficiënt doorzoeken van je documenten (via RAG - Retrieval-Augmented Generation) wordt Supabase als vector database gebruikt.
 
 ## Features
 
-- **Document Ingestion Graph**: Upload and parse PDFs into `Document` objects, then store vector embeddings into a vector database (we use Supabase in this example).
-- **Retrieval Graph**: Handle user questions, decide whether to retrieve documents or give a direct answer, then generate concise responses with references to the retrieved documents.
-- **Streaming Responses**: Real-time streaming of partial responses from the server to the client UI.
-- **LangGraph Integration**: Built using LangGraph's state machine approach to orchestrate ingestion and retrieval, visualise your agentic workflow, and debug each step of the graph.  
-- **Next.js Frontend**: Allows file uploads, real-time chat, and easy extension with React components and Tailwind.
+*   **PDF Verwerking & RAG**: Upload PDF's, die worden verwerkt en opgeslagen in Supabase voor snelle informatieherkenning.
+*   **Intelligente Chat**: Stelt vragen, begrijpt context, haalt relevante informatie uit je documenten op en geeft antwoord.
+*   **Weer Integratie**: Kan het actuele weer in Rotterdam opvragen als je over buiten sporten praat.
+*   **Streaming Reacties**: Antwoorden verschijnen direct in de chatinterface via streaming.
+*   **Moderne Tech Stack**: Gebouwd met Next.js (React) voor de frontend en Node.js/TypeScript met LangGraph voor de backend.
 
----
+## Architectuur
 
-## Architecture Overview
+De applicatie bestaat uit een frontend (webinterface) en een backend (API):
 
 ```ascii
-┌─────────────────────┐    1. Upload PDFs    ┌───────────────────────────┐
-│Frontend (Next.js)   │ ────────────────────> │Backend (LangGraph)       │
-│ - React UI w/ chat  │                      │ - Ingestion Graph         │
-│ - Upload .pdf files │ <────────────────────┤   + Vector embedding via  │
-└─────────────────────┘    2. Confirmation   │     SupabaseVectorStore   │
-(storing embeddings in DB)
-
-┌─────────────────────┐    3. Ask questions  ┌───────────────────────────┐
-│Frontend (Next.js)   │ ────────────────────> │Backend (LangGraph)       │
-│ - Chat + SSE stream │                      │ - Retrieval Graph         │
-│ - Display sources   │ <────────────────────┤   + Chat model (OpenAI)   │
-└─────────────────────┘ 4. Streamed answers  └───────────────────────────┘
-
-```
-- **Supabase** is used as the vector store to store and retrieve relevant documents at query time.  
-- **OpenAI** (or other LLM providers) is used for language modeling.  
-- **LangGraph** orchestrates the "graph" steps for ingestion, routing, and generating responses.  
-- **Next.js** (React) powers the user interface for uploading PDFs and real-time chat.
-
-The system consists of:
-- **Backend**: A Node.js/TypeScript service that contains LangGraph agent "graphs" for:
-  - **Ingestion** (`src/ingestion_graph.ts`) - handles indexing/ingesting documents
-  - **Retrieval** (`src/retrieval_graph.ts`) - question-answering over the ingested documents
-  - **Configuration** (`src/shared/configuration.ts`) - handles configuration for the backend api including model providers and vector stores
-- **Frontend**: A Next.js/React app that provides a web UI for users to upload PDFs and chat with the AI.
----
-
-## Prerequisites
-
-1. **Node.js v18+** (we recommend Node v20).
-2. **Yarn** (or npm, but this monorepo is pre-configured with Yarn).
-3. **Supabase project** (if you plan to store embeddings in Supabase; see [Setting up Supabase](https://supabase.com/docs/guides/getting-started)).
-   - You will need:
-     - `SUPABASE_URL`
-     - `SUPABASE_SERVICE_ROLE_KEY`
-     - A table named `documents` and a function named `match_documents` for vector similarity search (see [LangChain documentation for guidance on setting up the tables](https://js.langchain.com/docs/integrations/vectorstores/supabase/)).
-4. **OpenAI API Key** (or another LLM provider's key, supported by LangChain).
-5. **LangChain API Key** (free and optional, but highly recommended for debugging and tracing your LangChain and LangGraph applications). Learn more [here](https://docs.smith.langchain.com/administration/how_to_guides/organization_management/create_account_api_key)
-
----
-
-## Installation
-
-1. **Clone** the repository:
-
-   ```bash
-   git clone https://github.com/JoshuaLevi/PRG08-taalmodel-template.git.git
-   cd PRG08-taalmodel-template
-   ```
-
-2.	Install dependencies:
-
-```bash
-npm install
+┌─────────────────┐      Upload PDF / Stel Vraag     ┌───────────────────┐
+│ Frontend        │ <───────────────────────────────> │ Backend           │
+│ (Next.js/React) │       Antwoord / Bevestiging      │ (Node/LangGraph)  │
+│                 │ ────────────────────────────────> │ + OpenAI          │
+└─────────────────┘                                   │ + Supabase (RAG)  │
+                                                      │ + WeatherAPI      │
+                                                      └───────────────────┘
 ```
 
-	3.	Configure environment variables in both backend and frontend. See .env files (copy from .env.example if they exist, or create them manually based on the explanations below).
+-   **Frontend**: Draait op Vercel (of lokaal), verzorgt de chat UI en bestandsuploads.
+-   **Backend**: Draait op Render (of lokaal), handelt de logica af (documentverwerking, RAG, chat, weer-check) via LangGraph.
+-   **Supabase**: Externe dienst voor vectoropslag.
+-   **OpenAI/WeatherAPI**: Externe API's voor AI en weerdata.
+
+## Vereisten
+
+*   Node.js v18+ en npm
+*   Supabase Project (voor `SUPABASE_URL` en `SUPABASE_SERVICE_ROLE_KEY`)
+*   OpenAI API Key (`OPENAI_API_KEY`)
+*   WeatherAPI Key (`WEATHER_API_KEY`)
+*   LangSmith API Key (`LANGSMITH_API_KEY`, vereist voor backend deployment op Render, ook al gebruik je tracing niet actief)
+*   Docker Desktop (voor het lokaal bouwen van de backend image voor Render)
+*   Docker Hub Account (om de backend image te pushen)
+
+## Installatie
+
+1.  **Clone de repository:**
+    ```bash
+    git clone https://github.com/JoshuaLevi/prg08-taalmodel-2025.git
+    cd prg08-taalmodel-2025
+    ```
+2.  **Installeer dependencies:**
+    ```bash
+    npm install # Installeert voor zowel frontend als backend
+    ```
+3.  **Configureer Omgevingsvariabelen:** Maak `.env` bestanden aan in `frontend/` en `backend/` (zie voorbeelden in `.env.example`) en vul je API keys en Supabase credentials in.
+
+## Lokaal Draaien
+
+Start de backend en frontend afzonderlijk:
+
+*   **Backend:**
+    ```bash
+    cd backend
+    npm run langgraph:dev
+    ```
+*   **Frontend:**
+    ```bash
+    cd frontend
+    npm run dev
+    ```
+    Open daarna http://localhost:3000 in je browser.
+
+## Gebruik
+
+1.  Open de webinterface.
+2.  Upload een PDF via de paperclip-knop.
+3.  Stel je fitness-gerelateerde vragen in de chat! Vraag bijvoorbeeld naar het weer als je buiten wilt trainen.
+
+## Deployment
+
+Dit project is online gedeployed:
+
+*   **Backend:** De LangGraph API draait als een Web Service op **Render**.
+    *   De Docker image is lokaal gebouwd (voor `linux/amd64` platform) met `npx @langchain/langgraph-cli dockerfile Dockerfile` gevolgd door `docker build`.
+    *   De image is gepusht naar Docker Hub.
+    *   Render is geconfigureerd om deze "Existing Image" van Docker Hub te gebruiken.
+    *   Render vereist een PostgreSQL database en een Key Value (Redis) store voor LangGraph state management. De interne connectie URLs hiervan, samen met alle API keys (`OPENAI_API_KEY`, `WEATHER_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `LANGSMITH_API_KEY`), zijn ingesteld als environment variables in Render.
+*   **Frontend:** De Next.js applicatie is gedeployed op **Vercel**.
+    *   De `NEXT_PUBLIC_LANGGRAPH_API_URL` environment variable in Vercel wijst naar de `.onrender.com` URL van de backend service.
+
+## Beoordeling Volgens Criteria (PRG08 Opdracht 2: Taalmodel)
+
+Hieronder volgt een overzicht van hoe dit HyroCoach project voldoet aan de beoordelingscriteria voor de opdracht, per leerdoel:
+
+**Leerdoel: AI tools integreren in een professioneel ingerichte javascript applicatie.**
+
+*   **Beginner (Voldaan):**
+    *   *Client/Server onderdeel:* Project is opgesplitst in `frontend/` en `backend/` mappen. (✅)
+    *   *Project op GitHub met README:* Repository `JoshuaLevi/prg08-taalmodel-2025` bevat deze `README.md`. (✅)
+    *   *README bevat installatie/issues:* Deze README bevat installatie-, configuratie- en deploymentinstructies. (✅)
+    *   *API keys afgeschermd (.env):* Zowel frontend als backend gebruiken `.env` bestanden voor API keys en credentials. (✅)
+    *   *Server communiceert met OpenAI:* De backend gebruikt `@langchain/openai` om calls te maken naar de OpenAI API. (✅, zie `backend/src/shared/utils.ts`)
+*   **Op Niveau (Voldaan):**
+    *   *Client toont resultaten (UI):* De React frontend (`frontend/app/page.tsx`) toont de chatberichten en antwoorden van de AI. (✅)
+    *   *Gebruiksvriendelijke/duidelijke interface:* De UI is een standaard chatinterface die functioneel en gestyled is met Shadcn UI. (✅)
+    *   *Gebruikersinvoer voor prompt:* Het tekstveld in de chatinterface dient als invoer voor de prompts naar de backend. (✅)
+    *   *Geen calls voor vorig resultaat:* De frontend wacht op het volledige (gestreamde) antwoord van een request voordat een nieuwe gestart kan worden. (✅)
+*   **Expert (Voldaan):**
+    *   *Project live online:* De frontend is gedeployed op Vercel en de backend op Render. (✅, zie [Deployment](#deployment) sectie)
+
+**Leerdoel: Werken met taalmodellen en de bijbehorende API's in javascript.**
+
+*   **Beginner (Voldaan):**
+    *   *Server call naar (Azure) OpenAI API:* De backend maakt calls naar de OpenAI API (niet Azure specifiek). (✅, zie `backend/src/shared/utils.ts`)
+    *   *Uitleggen code/ChatLLM:* Dit wordt behandeld in de video-uitleg.
+*   **Op Niveau (Voldaan):**
+    *   *Uitleggen/toepassen Prompt Engineering:* Prompts zijn specifiek ontworpen voor de fitness coach persona en de RAG/routing logica. (✅, zie `backend/src/retrieval_graph/prompts.ts`)
+    *   *Chat History (met roles) op server:* LangGraph beheert de state, inclusief de `messages` (met `HumanMessage`, `AIMessage`, `ToolMessage`), en slaat deze op in de geconfigureerde Postgres database en Redis op Render. (✅, zie `backend/src/retrieval_graph/state.js` en de configuratie op Render)
+    *   *LLM weet waar het gesprek over gaat:* De berichtengeschiedenis (`state.messages`) wordt meegestuurd in de prompts naar het LLM. (✅, zie `backend/src/retrieval_graph/graph.ts` in `generateResponse` en `answerQueryDirectly`)
+*   **Expert (Voldaan):**
+    *   *Applicatie werkt met streaming:* Zowel de backend (via LangGraph's streaming support en SSE) als de frontend (verwerken van de stream in `frontend/app/page.tsx`) ondersteunen streaming van antwoorden. (✅)
+
+**Leerdoel: Een taalmodel gebruiken om vragen over mijn eigen documenten te beantwoorden.**
+
+*   **Beginner (Voldaan):**
+    *   *Uitleggen nut RAG:* Dit wordt behandeld in de video-uitleg.
+*   **Op Niveau (Voldaan):**
+    *   *Embeddings gemaakt van eigen document:* Bij het uploaden van een PDF wordt de `ingestion_graph` aangeroepen die de tekst split en embeddings genereert via OpenAI. (✅, zie `backend/src/ingestion_graph/graph.ts`)
+    *   *Embeddings opgeslagen in database:* De gegenereerde embeddings worden opgeslagen in de geconfigureerde Supabase vector database. (✅, zie `backend/src/shared/vectorstore.ts`)
+    *   *Vragen stellen over eigen document:* De `retrieval_graph` bepaalt of retrieval nodig is, haalt relevante document chunks op uit Supabase, en gebruikt deze als context voor het beantwoorden van de vraag. (✅, zie `backend/src/retrieval_graph/graph.ts` nodes `retrieveDocuments` en `generateResponse`)
+*   **Expert (Voldaan):**
+    *   *Werkt met grotere bestanden (min. 15 pagina's):* De architectuur (tekst splitting, vector store) is ontworpen om met grotere documenten om te gaan. Getest met documenten tot 50 pagina's. (✅)
 
-## Environment Variables
+**Leerdoel: Op conceptueel niveau nadenken over AI toepassingen. Ik kan zelfstandig onderzoek doen naar documentatie.**
 
-The project relies on environment variables to configure keys and endpoints. Ensure you have `.env` files in both the `frontend` and `backend` directories and fill in your details.
+*   **Beginner (Voldaan):**
+    *   *Uitleg categorie/doelgroep/toegevoegde waarde:* Concept (Fitness Coach voor gepersonaliseerd advies) is beschreven in deze README en geïmplementeerd in de applicatie/prompts. (✅)
+*   **Op Niveau (Voldaan):**
+    *   *Toegang tot live data (internet):* De WeatherAPI tool is geïmplementeerd en geïntegreerd in de LangGraph om actuele weersinformatie te bieden. (✅, zie `backend/src/retrieval_graph/tools.ts` en `backend/src/retrieval_graph/graph.ts`)
+*   **Expert (Voldaan):**
+    *   *Je hebt het taalmodel geïntegreerd in een React applicatie:* De frontend is een React (Next.js) applicatie die direct communiceert met de backend taalmodel-API. (✅)
 
-### Frontend Variables
 
-Create a .env file in frontend:
-
-`cp frontend/.env.example frontend/.env`
-
-```
-    NEXT_PUBLIC_LANGGRAPH_API_URL=http://localhost:2024
-    LANGCHAIN_API_KEY=your-langsmith-api-key-here # Optional: LangSmith API key
-    LANGGRAPH_INGESTION_ASSISTANT_ID=ingestion_graph
-    LANGGRAPH_RETRIEVAL_ASSISTANT_ID=retrieval_graph
-
-    LANGCHAIN_TRACING_V2=true # Optional: Enable LangSmith tracing
-
-    LANGCHAIN_PROJECT="pdf-chatbot" # Optional: LangSmith project name
-```
-
-### Backend Variables
-
-Create a .env file in backend:
-
-`cp backend/.env.example backend/.env`
-
-```
-    OPENAI_API_KEY=your-openai-api-key-here
-    SUPABASE_URL=your-supabase-url-here
-    SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key-here
-
-    LANGCHAIN_TRACING_V2=true # Optional: Enable LangSmith tracing
-
-    LANGCHAIN_PROJECT="pdf-chatbot" # Optional: LangSmith project name
-```
-
-**Explanation of Environment Variables:**
-
--   `NEXT_PUBLIC_LANGGRAPH_API_URL`: The URL where your LangGraph backend server is running.  Defaults to `http://localhost:2024` for local development. 
--   `LANGCHAIN_API_KEY`: Your LangSmith API key.  This is optional, but highly recommended for debugging and tracing your LangChain and LangGraph applications.
--   `LANGGRAPH_INGESTION_ASSISTANT_ID`: The ID of the LangGraph assistant for document ingestion. Default is `ingestion_graph`.
--   `LANGGRAPH_RETRIEVAL_ASSISTANT_ID`: The ID of the LangGraph assistant for question answering. Default is `retrieval_graph`.
--   `LANGCHAIN_TRACING_V2`:  Enable tracing to debug your application on the LangSmith platform.  Set to `true` to enable.
--   `LANGCHAIN_PROJECT`:  The name of your LangSmith project.
--   `OPENAI_API_KEY`: Your OpenAI API key.
--   `SUPABASE_URL`: Your Supabase URL.
--   `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key.
-
-
-
-## Local Development
-
-This monorepo uses Turborepo to manage both backend and frontend projects. You can run them separately for development using npm.
-
-### Running the Backend
-
-1.	Navigate to backend:
-
-```bash
-cd backend
-```
-
-2.	Install dependencies (already done if you ran `npm install` at the root).
-
-3.	Start LangGraph in dev mode:
-
-```bash
-npm run langgraph:dev
-```
-
-This will launch a local LangGraph server on port 2024 by default. It might redirect you to a UI for interacting with the LangGraph server.
-
-### Running the Frontend
-
-1. Navigate to frontend:
-
-```bash
-cd frontend
-```
-
-2. Start the Next.js development server:
-
-```bash
-npm run dev
-```
-
-This will start a local Next.js development server (by default on port 3000).
-
-Access the UI in your browser at http://localhost:3000.
-
-## Usage
-
-Once both services are running:
-
-1. Use langgraph studio UI to interact with the LangGraph server and ensure the workflow is working as expected.
-
-2. Navigate to http://localhost:3000 to use the chatbot UI.
-
-3. Upload a small PDF document via the file upload button at the bottom of the page. This will trigger the ingestion graph to extract the text and store the embeddings in Supabase via the frontend `app/api/ingest` route.
-	
-4. After the ingestion is complete, ask questions in the chat input.
-
-5. The chatbot will trigger the retrieval graph via the `app/api/chat` route to retrieve the most relevant documents from the vector database and use the relevant PDF context (if needed) to answer.
-
-
-### Uploading/Ingesting PDFs
-
-Click on the paperclip icon in the chat input area.
-
-Select one or more PDF files to upload ensuring a total of max 5, each under 10MB (you can change these threshold values in the `app/api/ingest` route).
-
-The backend processes the PDFs, extracts text, and stores embeddings in Supabase (or your chosen vector store).
-
-### Asking Questions
-
-- Type your question in the chat input field.
-- Responses stream in real time. If the system retrieved documents, you'll see a link to "View Sources" for each chunk of text used in the answer.
-
-### Viewing Chat History
-
-- The system creates a unique thread per user session (frontend). All messages are kept in the state for the session.
-- For demonstration purposes, the current example UI does not store the entire conversation beyond the local thread state and is not persistent across sessions. You can extend it to persist threads in a database. However, the "ingested documents" are persistent across sessions as they are stored in a vector database.
-
-
-## Deploying the Backend
-
-To deploy your LangGraph agent to a cloud service, you can either use LangGraph's cloud as per this [guide](https://langchain-ai.github.io/langgraph/cloud/quick_start/?h=studio#deploy-to-langgraph-cloud) or self-host it as per this [guide](https://langchain-ai.github.io/langgraph/how-tos/deploy-self-hosted/).
-
-## Deploying the Frontend
-The frontend can be deployed to any hosting that supports Next.js (Vercel, Netlify, etc.).
-
-Make sure to set relevant environment variables in your deployment environment. In particular, ensure `NEXT_PUBLIC_LANGGRAPH_API_URL` is pointing to your deployed backend URL.
-
-## Customizing the Agent
-
-You can customize the agent on the backend and frontend.
-
-### Backend
-
-- In the configuration file `src/shared/configuration.ts`, you can change the default configs i.e. the vector store, k-value, and filter kwargs, shared between the ingestion and retrieval graphs. On the backend, configs can be used in each node of the graph workflow or from frontend, you can pass a config object into the graph's client.
-- You can adjust the prompts in the `src/retrieval_graph/prompts.ts` file.
-- If you'd like to change the retrieval model, you can do so in the `src/shared/retrieval.ts` file by adding another retriever function that encapsulates the desired client for the vector store and then updating the `makeRetriever` function to return the new retriever.
-
-
-### Frontend
-
-- You can modify the file upload restrictions in the `app/api/ingest` route.
-- In `constants/graphConfigs.ts`, you can change the default config objects sent to the ingestion and retrieval graphs. These include the model provider, k value (no of source documents to retrieve), and retriever provider (i.e. vector store).
-
-
-## Troubleshooting
-1. .env Not Loaded
-   - Make sure you copied .env.example to .env in both backend and frontend.
-   - Check your environment variables are correct and restart the dev server.
-
-2. Supabase Vector Store
-   - Ensure you have configured your Supabase instance with the documents table and match_documents function. Check the official LangChain docs on Supabase integration.
-
-3. OpenAI Errors
-   - Double-check your OPENAI_API_KEY. Make sure you have enough credits/quota.
-
-4. LangGraph Not Running
-   - If `npm run langgraph:dev` fails, confirm your Node version is >= 18 and that you have all dependencies installed using `npm install`.
-
-5. Network Errors
-   - Frontend must point to the correct NEXT_PUBLIC_LANGGRAPH_API_URL. By default, it is http://localhost:2024.
-
-## Next Steps
-
-If you'd like to contribute to this project, feel free to open a pull request. Ensure it is well documented and includes tests in the test files.
-
-If you'd like to learn more about building AI chatbots and agents with LangChain and LangGraph, check out the book [Learning LangChain (O'Reilly)](https://www.oreilly.com/library/view/learning-langchain/9781098167271/).
 

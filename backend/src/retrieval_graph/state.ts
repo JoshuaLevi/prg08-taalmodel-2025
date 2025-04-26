@@ -22,5 +22,8 @@ export const AgentStateAnnotation = Annotation.Root({
     reducer: reduceDocs,
   }),
 
+  // Correct syntax for a simple value annotation
+  weather_result: Annotation<string | null>(),
+
   // Additional attributes can be added here as needed
 });

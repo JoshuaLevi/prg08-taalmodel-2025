@@ -39,15 +39,15 @@ export function ChatMessage({ message }: ChatMessageProps) {
     message.sources.length > 0;
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       <div
-        className={`max-w-[85%] ${isUser ? 'bg-black text-white' : 'bg-muted'} rounded-2xl px-4 py-2`}
+        className={`max-w-[85%] ${isUser ? 'bg-[#DFFFD6] text-[#343A40]' : 'bg-[#E0F0FF] text-[#343A40]'} rounded-[16px] px-4 py-2 shadow-sm`}
       >
         {isLoading ? (
           <div className="flex space-x-1 h-6 items-center">
-            <div className="w-1.5 h-1.5 bg-current rounded-full animate-[loading_1s_ease-in-out_infinite]" />
-            <div className="w-1.5 h-1.5 bg-current rounded-full animate-[loading_1s_ease-in-out_0.2s_infinite]" />
-            <div className="w-1.5 h-1.5 bg-current rounded-full animate-[loading_1s_ease-in-out_0.4s_infinite]" />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[loading_1s_ease-in-out_infinite]" />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[loading_1s_ease-in-out_0.2s_infinite]" />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-[loading_1s_ease-in-out_0.4s_infinite]" />
           </div>
         ) : (
           <>
@@ -57,12 +57,12 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-8 w-8 rounded-full text-secondary hover:bg-secondary/20 hover:text-secondary-foreground focus-visible:ring-ring focus-visible:ring-offset-1"
                   onClick={handleCopy}
-                  title={copied ? 'Copied!' : 'Copy to clipboard'}
+                  title={copied ? 'Gekopieerd!' : 'Kopieer naar klembord'}
                 >
                   <Copy
-                    className={`h-4 w-4 ${copied ? 'text-green-500' : ''}`}
+                    className={`h-4 w-4 transition-colors ${copied ? 'text-accent' : ''}`}
                   />
                 </Button>
               </div>
@@ -70,10 +70,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
             {showSources && message.sources && (
               <Accordion type="single" collapsible className="w-full mt-2">
                 <AccordionItem value="sources" className="border-b-0">
-                  <AccordionTrigger className="text-sm py-2 justify-start gap-2 hover:no-underline">
-                    View Sources ({message.sources.length})
+                  <AccordionTrigger className="text-sm py-1 px-2 justify-start gap-1 hover:no-underline text-secondary hover:bg-secondary/10 rounded-md transition-colors">
+                    Bekijk bronnen ({message.sources.length})
                   </AccordionTrigger>
-                  <AccordionContent>
+                  <AccordionContent className="pt-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {message.sources?.map((source, index) => (
                         <Card

@@ -1,3 +1,13 @@
+# Dependencies
+node_modules/
 
-# LangGraph API
-.langgraph_api
+# Build output
+dist/
+
+# LangGraph API cache/state
+.langgraph_api/
+
+# Environment variables
+.env
+
+Dockerfile

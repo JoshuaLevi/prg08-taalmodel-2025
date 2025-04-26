@@ -1,29 +1,37 @@
-import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 interface ExamplePromptsProps {
   onPromptSelect: (prompt: string) => void
 }
 
+// Updated example prompts for general fitness (in Dutch)
 const EXAMPLE_PROMPTS = [
   {
-    title: "What is this document about?",
+    title: "Kun je een persoonlijk trainingsplan voor me maken?",
   },
   {
-    title: "What is music?",
+    title: "Hoe voer ik een squat correct uit?",
+  },
+  {
+    title: "Wat zijn goede oefeningen voor buikspieren?",
+  },
+  {
+    title: "Geef me algemene voedingstips voor spieropbouw.",
   },
 ]
 
 export function ExamplePrompts({ onPromptSelect }: ExamplePromptsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+    <div className="flex flex-wrap justify-center gap-2 mb-4">
       {EXAMPLE_PROMPTS.map((prompt, i) => (
-        <Card 
-          key={i} 
-          className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+        <Button 
+          key={i}
+          variant="outline"
+          className="rounded-full border-foreground/50 text-foreground/80 hover:bg-secondary/10 hover:text-secondary-foreground focus-visible:ring-ring focus-visible:ring-offset-1 h-auto px-4 py-2 text-sm whitespace-normal text-center transition-colors duration-150"
           onClick={() => onPromptSelect(prompt.title)}
         >
-          <p className="text-sm text-center font-medium">{prompt.title}</p>
-        </Card>
+          {prompt.title}
+        </Button>
       ))}
     </div>
   )

@@ -1,8 +1,9 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
-  "description": "Frontend for the AI chatbot based on the book Learning LangChain",
+  "name": "ai-chatbot-frontend",
+  "version": "1.0.0",
+  "description": "Frontend voor de AI Fitness Coach Chatbot",
   "private": true,
+  "author": "Joshua",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -44,6 +45,7 @@
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@tailwindcss/typography": "latest",
+    "ai": "^4.3.10",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

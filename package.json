@@ -1,9 +1,9 @@
 {
-    "name": "ai-pdf-chatbot-langchain",
-    "description": "AI PDF chatbot template based on the book Learning LangChain (O'Reilly)",
+    "name": "prg08-taalmodel",
+    "description": "AI Fitness Coach Chatbot",
     "private": true,
-    "version": "0.0.1",
-    "author": "Mayo Oshin",
+    "version": "1.0.0",
+    "author": "Joshua",
     "license": "MIT",
     "workspaces": [
       "backend",

@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Paperclip, ArrowUp, Loader2 } from 'lucide-react';
+import { Paperclip, ArrowUp, Loader2, Activity } from 'lucide-react';
 import { ExamplePrompts } from '@/components/example-prompts';
 import { ChatMessage } from '@/components/chat-message';
 import { FilePreview } from '@/components/file-preview';
@@ -17,7 +17,9 @@ import {
   PDFDocument,
   RetrieveDocumentsNodeUpdates,
 } from '@/types/graphTypes';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { Header } from '@/components/header';
+
 export default function Home() {
   const { toast } = useToast(); // Add this hook
   const [messages, setMessages] = useState<
@@ -50,9 +52,9 @@ export default function Home() {
       } catch (error) {
         console.error('Error creating thread:', error);
         toast({
-          title: 'Error',
+          title: 'Fout',
           description:
-            'Error creating thread. Please make sure you have set the LANGGRAPH_API_URL environment variable correctly. ' +
+            'Fout bij het aanmaken van de thread. Controleer of de LANGGRAPH_API_URL correct is ingesteld. ' +
             error,
           variant: 'destructive',
         });
@@ -183,16 +185,16 @@ export default function Home() {
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: 'Error',
+        title: 'Fout',
         description:
-          'Failed to send message. Please try again.\n' +
-          (error instanceof Error ? error.message : 'Unknown error'),
+          'Kon bericht niet verzenden. Probeer het opnieuw.\n' +
+          (error instanceof Error ? error.message : 'Onbekende fout'),
         variant: 'destructive',
       });
       setMessages((prev) => {
         const newArr = [...prev];
         newArr[newArr.length - 1].content =
-          'Sorry, there was an error processing your message.';
+          'Sorry, er was een fout bij het verwerken van je bericht.';
         return newArr;
       });
     } finally {
@@ -210,8 +212,8 @@ export default function Home() {
     );
     if (nonPdfFiles.length > 0) {
       toast({
-        title: 'Invalid file type',
-        description: 'Please upload PDF files only',
+        title: 'Ongeldig bestandstype',
+        description: 'Upload alleen PDF-bestanden a.u.b.',
         variant: 'destructive',
       });
       return;
@@ -236,17 +238,17 @@ export default function Home() {
 
       setFiles((prev) => [...prev, ...selectedFiles]);
       toast({
-        title: 'Success',
-        description: `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''} uploaded successfully`,
+        title: 'Succes',
+        description: `${selectedFiles.length} bestand${selectedFiles.length > 1 ? 'en' : ''} succesvol geüpload`,
         variant: 'default',
       });
     } catch (error) {
       console.error('Error uploading files:', error);
       toast({
-        title: 'Upload failed',
+        title: 'Upload mislukt',
         description:
-          'Failed to upload files. Please try again.\n' +
-          (error instanceof Error ? error.message : 'Unknown error'),
+          'Kon bestanden niet uploaden. Probeer het opnieuw.\n' +
+          (error instanceof Error ? error.message : 'Onbekende fout'),
         variant: 'destructive',
       });
     } finally {
@@ -260,108 +262,108 @@ export default function Home() {
   const handleRemoveFile = (fileToRemove: File) => {
     setFiles(files.filter((file) => file !== fileToRemove));
     toast({
-      title: 'File removed',
-      description: `${fileToRemove.name} has been removed`,
+      title: 'Bestand verwijderd',
+      description: `${fileToRemove.name} is verwijderd`,
       variant: 'default',
     });
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-4 md:p-24 max-w-5xl mx-auto w-full">
-      {messages.length === 0 ? (
-        <>
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <p className="font-medium text-muted-foreground max-w-md mx-auto">
-                This ai chatbot is an example template to accompany the book:{' '}
-                <a
-                  href="https://www.oreilly.com/library/view/learning-langchain/9781098167271/"
-                  className="underline hover:text-foreground"
-                >
-                  Learning LangChain (O'Reilly): Building AI and LLM
-                  applications with LangChain and LangGraph
-                </a>
-              </p>
+    <div className="flex flex-col h-screen overflow-hidden">
+      <Header />
+      <main className="flex-1 overflow-y-auto flex flex-col items-center p-4 md:p-6 max-w-5xl mx-auto w-full">
+        {messages.length === 0 ? (
+          <>
+            <div className="flex-1 flex items-center justify-center w-full">
+              <Card className="p-6 max-w-lg w-full border-border/80 shadow-sm">
+                <div className="flex flex-col items-center text-center gap-4">
+                  <Activity className="w-12 h-12 text-primary" />
+                  <p className="font-medium text-foreground/90">
+                    Welkom bij HyroCoach! Upload een PDF (zoals een Hyrox schema) en stel vragen voor persoonlijk trainingsadvies.
+                  </p>
+                </div>
+              </Card>
             </div>
+            <ExamplePrompts onPromptSelect={setInput} />
+          </>
+        ) : (
+          <div className="w-full space-y-4">
+            {messages.map((message, i) => (
+              <ChatMessage key={i} message={message} />
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-          <ExamplePrompts onPromptSelect={setInput} />
-        </>
-      ) : (
-        <div className="w-full space-y-4 mb-20">
-          {messages.map((message, i) => (
-            <ChatMessage key={i} message={message} />
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      )}
-
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background">
-        <div className="max-w-5xl mx-auto space-y-4">
+        )}
+      </main>
+      <footer className="sticky bottom-0 left-0 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
+        <div className="container mx-auto px-4 py-3">
+          {/* Render file previews */}
           {files.length > 0 && (
-            <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-wrap gap-2 mb-2">
               {files.map((file, index) => (
                 <FilePreview
-                  key={`${file.name}-${index}`}
+                  key={index}
                   file={file}
                   onRemove={() => handleRemoveFile(file)}
                 />
               ))}
             </div>
           )}
-
-          <form onSubmit={handleSubmit} className="relative">
-            <div className="flex gap-2 border rounded-md overflow-hidden bg-gray-50">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                accept=".pdf"
-                multiple
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="rounded-none h-12"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-              >
-                {isUploading ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  </div>
-                ) : (
-                  <Paperclip className="h-4 w-4" />
-                )}
-              </Button>
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  isUploading ? 'Uploading PDF...' : 'Send a message...'
-                }
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-12 bg-transparent"
-                disabled={isUploading || isLoading || !threadId}
-              />
-              <Button
-                type="submit"
-                size="icon"
-                className="rounded-none h-12"
-                disabled={
-                  !input.trim() || isUploading || isLoading || !threadId
-                }
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <ArrowUp className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+          <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            {/* File Upload Button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-full border-foreground/50 text-foreground/80 hover:bg-secondary/10 hover:text-secondary-foreground focus-visible:ring-ring focus-visible:ring-offset-1 transition-colors duration-150 flex-shrink-0"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              title="PDF document uploaden"
+            >
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Paperclip className="h-4 w-4" />
+              )}
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".pdf"
+              multiple
+              onChange={handleFileUpload}
+              disabled={isUploading}
+            />
+            {/* Chat Input Field */}
+            <Input
+              type="text"
+              placeholder="Vraag aan HyroCoach..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1 px-4 py-2 bg-background border border-input rounded-full focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0"
+              disabled={isLoading || isUploading}
+            />
+            {/* Send Button */}
+            <Button
+              type="submit"
+              variant="default"
+              size="icon"
+              className="h-9 w-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 focus-visible:ring-ring focus-visible:ring-offset-1"
+              disabled={!input.trim() || isLoading || isUploading}
+              title="Bericht verzenden"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4" />
+              )}
+            </Button>
           </form>
+          {/* Optional: Add attribution or links here if needed */}
+          {/* <p className="text-center text-xs text-muted-foreground mt-2">Powered by LangChain</p> */}
         </div>
-      </div>
-    </main>
+      </footer>
+    </div>
   );
 }
